@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un Defi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-light">
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Réveillon de l'info</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto d-flex align-items-center">
+
+
+                <!-- Affichage de l'icône utilisateur et nom -->
+                <li class="nav-item d-flex align-items-center me-4" >
+                    <span class="me-2" style="font-size: 1.5rem; color: #7fff00;">👤</span>
+                    <span class="text-white" style="font-size: 1.1rem;" th:text="${#authentication.name}"></span>
+                </li>
+                <li class="nav-item me-3">
+                    <a class="nav-link" th:href="@{/defis/all}"><i class="fa fa-trophy me-2"></i> Défis</a>
+                </li>
+                <!-- Lien vers les équipes -->
+                <li class="nav-item me-3"  th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link" th:href="@{/equipes/all}"><i class="fa fa-users me-2"></i> Équipes</a>
+                </li>
+
+                <!-- Lien vers les résultats -->
+                <li class="nav-item me-3"  th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link" th:href="@{/resultats/all}"><i class="fa fa-tasks me-2"></i> Résultats</a>
+                </li>
+
+                <!-- Lien vers les défis -->
+
+
+                <!-- Lien vers les leaders (affiché seulement si l'utilisateur a le rôle ADMIN) -->
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link" th:href="@{/leaders/all}"><i class="fa fa-chalkboard-teacher me-2"></i> Leaders</a>
+                </li>
+
+                <!-- Lien vers les thèmes (affiché seulement si l'utilisateur a le rôle ADMIN) -->
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link" th:href="@{/themes/all}"><i class="fa fa-cogs me-2"></i> Thèmes</a>
+                </li>
+                <!-- Lien de déconnexion -->
+                <li class="nav-item" >
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-link nav-link text-white"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</button>
+                    </form>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container mt-5">
+    <h1 class="mb-4">Modifier un Defi</h1>
+
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <form th:action="@{/defis/update}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:value="${defi.id}" name="id">
+
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom du Societe</label>
+            <input type="text" class="form-control" id="nom" name="nom" th:value="${defi.nom}" required>
+        </div>
+
+
+
+        <div class="mb-3">
+            <label for="validation" class="form-label">État</label>
+            <select id="validation" class="form-select" name="validation">
+                <option value="Pas Encore">Pas Encore</option>
+                <option value="Accepté">Accepté</option>
+                <option value="Refusé">Refusé</option>
+            </select>
+        </div>
+
+
+
+
+
+        <div class="mb-3">
+            <img th:src="${defi.images != null ? '/uploads/' + defi.images : '/imagess/inconnu.jpg'}"
+                 alt="LOGO du société" width="100" height="100" class="rounded mb-2">
+            <input type="file" class="form-control" id="image" name="image">
+        </div>
+
+
+        <div class="mb-3">
+            <label for="titre" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="titre" name="titre" th:value="${defi.titre}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" th:value="${defi.email}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="tel" class="form-label">Téléphone</label>
+            <input type="number" class="form-control" id="tel" name="tel" th:value="${defi.tel}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="theme" class="form-label">Thème</label>
+            <select class="form-select" id="theme" name="theme" required>
+                <option value="">Sélectionnez une theme</option>
+                <option th:each="theme : ${themes}" th:value="${theme.id}" th:text="${theme.name}"
+                        th:selected="${theme.id == defi.theme?.id}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="problem" class="form-label">Problème</label>
+            <input type="text" class="form-control" id="problem" name="problem" th:value="${defi.problem}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="retour" class="form-label">Retour</label>
+            <input type="text" class="form-control" id="retour" name="retour" th:value="${defi.retour}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="first" class="form-label">Premier prix</label>
+            <input type="text" class="form-control" id="first" name="first" th:value="${defi.first}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="second" class="form-label">Second prix</label>
+            <input type="text" class="form-control" id="second" name="second" th:value="${defi.second}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="third" class="form-label">Troisième prix</label>
+            <input type="text" class="form-control" id="third" name="third" th:value="${defi.third}" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        <a href="/defis/all" class="btn btn-secondary">Retour</a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
